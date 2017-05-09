@@ -9,17 +9,48 @@
         <mark key="^" line="0" column="0" />
         <mark key="." line="0" column="0" />
       </file>
+      <file name="/Dummy.txt" timestamp="1494345928156">
+        <mark key="[" line="0" column="0" />
+      </file>
       <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/server.c" timestamp="1494324811449">
+        <mark key="[" line="0" column="0" />
+      </file>
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/CMakeLists.txt" timestamp="1494345503826">
+        <mark key="[" line="5" column="17" />
+        <mark key="]" line="5" column="17" />
+        <mark key="." line="5" column="17" />
+      </file>
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/server.c" timestamp="1494345602196">
         <mark key="[" line="0" column="0" />
       </file>
     </filemarks>
     <jumps />
-    <registers />
+    <registers>
+      <register name="&quot;" type="4">
+        <text>main.</text>
+      </register>
+      <register name="-" type="4">
+        <text>main.</text>
+      </register>
+      <register name="/" type="4">
+        <text encoding="base64">XDwvXD4=</text>
+      </register>
+    </registers>
     <search>
-      <last-dir>0</last-dir>
+      <last-search encoding="base64">XDwvXD4=</last-search>
+      <last-offset />
+      <last-pattern encoding="base64">XDwvXD4=</last-pattern>
+      <last-dir>-1</last-dir>
       <show-last>false</show-last>
     </search>
-    <history />
+    <history>
+      <history-search>
+        <entry encoding="base64">XDwvXD4=</entry>
+      </history-search>
+      <history-cmd />
+      <history-expr />
+      <history-input />
+    </history>
     <shortcut-conflicts />
     <editor>
       <key-repeat enabled="false" />

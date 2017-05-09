@@ -3,8 +3,11 @@
     <state version="4" enabled="true" />
     <globalmarks />
     <filemarks>
-      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/main.c" timestamp="1494318968447">
-        <mark key="[" line="5" column="0" />
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/main.c" timestamp="1494323365540">
+        <mark key="[" line="1" column="0" />
+        <mark key="]" line="0" column="0" />
+        <mark key="^" line="0" column="0" />
+        <mark key="." line="0" column="0" />
       </file>
     </filemarks>
     <jumps />

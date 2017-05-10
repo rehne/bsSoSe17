@@ -12,8 +12,10 @@
         <mark key="^" line="0" column="0" />
         <mark key="." line="0" column="0" />
       </file>
-      <file name="/Dummy.txt" timestamp="1494345928156">
-        <mark key="[" line="0" column="0" />
+      <file name="/Dummy.txt" timestamp="1494403554503">
+        <mark key="[" line="0" column="16" />
+        <mark key="]" line="0" column="17" />
+        <mark key="." line="0" column="17" />
       </file>
       <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/server.c" timestamp="1494324811449">
         <mark key="[" line="0" column="0" />
@@ -26,8 +28,8 @@
       <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/README.md" timestamp="1494347386875">
         <mark key="[" line="5" column="0" />
       </file>
-      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/server.c" timestamp="1494345602196">
-        <mark key="[" line="0" column="0" />
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/server.c" timestamp="1494403492395">
+        <mark key="[" line="3" column="10" />
       </file>
     </filemarks>
     <jumps />

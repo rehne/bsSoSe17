@@ -3,15 +3,19 @@
     <state version="4" enabled="true" />
     <globalmarks />
     <filemarks>
+<<<<<<< HEAD
       <file name="vim_settings.xml" timestamp="1494346511447">
         <mark key="[" line="0" column="0" />
       </file>
+=======
+>>>>>>> origin/master
       <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/main.c" timestamp="1494323365540">
         <mark key="[" line="1" column="0" />
         <mark key="]" line="0" column="0" />
         <mark key="^" line="0" column="0" />
         <mark key="." line="0" column="0" />
       </file>
+<<<<<<< HEAD
       <file name="/Dummy.txt" timestamp="1494345928156">
         <mark key="[" line="0" column="0" />
       </file>
@@ -28,11 +32,19 @@
       </file>
       <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/server.c" timestamp="1494345602196">
         <mark key="[" line="0" column="0" />
+=======
+      <file name="$USER_HOME$/CLionProjects/BSSS17/bsSoSe17/server.c" timestamp="1494415748155">
+        <mark key="[" line="4" column="19" />
+        <mark key="]" line="4" column="19" />
+        <mark key="." line="4" column="19" />
+        <mark key="^" line="15" column="0" />
+>>>>>>> origin/master
       </file>
     </filemarks>
     <jumps />
     <registers>
       <register name="&quot;" type="4">
+<<<<<<< HEAD
         <text>main.</text>
       </register>
       <register name="-" type="4">
@@ -40,6 +52,12 @@
       </register>
       <register name="/" type="4">
         <text encoding="base64">XDwvXD4=</text>
+=======
+        <text encoding="base64">Lmg+</text>
+      </register>
+      <register name="-" type="4">
+        <text encoding="base64">Lmg+</text>
+>>>>>>> origin/master
       </register>
     </registers>
     <search>
@@ -47,14 +65,44 @@
       <show-last>false</show-last>
     </search>
     <history>
+<<<<<<< HEAD
       <history-search>
         <entry encoding="base64">XDwvXD4=</entry>
       </history-search>
+=======
+      <history-search />
+>>>>>>> origin/master
       <history-cmd />
       <history-expr />
       <history-input />
     </history>
+<<<<<<< HEAD
     <shortcut-conflicts />
+=======
+    <shortcut-conflicts>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed A</text>
+      </shortcut-conflict>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed I</text>
+      </shortcut-conflict>
+      <shortcut-conflict owner="ide">
+        <text>ctrl pressed V</text>
+      </shortcut-conflict>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed F</text>
+      </shortcut-conflict>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed C</text>
+      </shortcut-conflict>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed X</text>
+      </shortcut-conflict>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed S</text>
+      </shortcut-conflict>
+    </shortcut-conflicts>
+>>>>>>> origin/master
     <editor>
       <key-repeat enabled="false" />
     </editor>

@@ -20,7 +20,7 @@ int main(){
     sin.sin_addr.s_addr = INADDR_ANY;
     sin.sin_port = htons(4711);
 
-    // Socket binden.. klappt noch nicht. Port ist immer belegt
+    // Socket binden
     if(bind(sock, (struct sockaddr *) &sin, sizeof(sin)) != 0){
       printf("Der Port ist nicht frei - belegt!\n");
     } else {

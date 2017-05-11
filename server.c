@@ -7,19 +7,30 @@
 int main(){
     int sock;
     struct sockaddr_in sin;
+    const int y = 1;
 
     // Socket erzeugen
     if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0){
-      printf("Socket: %i\n", sock);
+      printf("Socket: %i wurde angelegt!\n", sock);
     }
 
-    // Socket binden
-    bind(sock, (struct sockaddr *)& sin, sizeof(sin));
+    // Initialisieren von sin mit geeigneten Werten
+    int sin_len = sizeof(sin);
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = INADDR_ANY;
+    sin.sin_port = htons(4711);
+
+    // Socket binden.. klappt noch nicht. Port ist immer belegt
+    if(bind(sock, (struct sockaddr *) &sin, sizeof(sin)) != 0){
+      printf("Der Port ist nicht frei - belegt!\n");
+    } else {
+      printf("Socket wurde gebunden!\n");
+    }
 
     // Socket wartet auf eingehende Verbindungen
     listen(sock, 5);
 
     // Socket schließen
-    unlink((const char *)& sin);
+    unlink((const char *) &sin);
     return (EXIT_SUCCESS);
 }

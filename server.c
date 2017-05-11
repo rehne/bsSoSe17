@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 int main(){
@@ -8,7 +9,9 @@ int main(){
     struct sockaddr_in sin;
 
     // Socket erzeugen
-    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0){
+      printf("Socket: %i\n", sock);
+    }
 
     // Socket binden
     bind(sock, (struct sockaddr *)& sin, sizeof(sin));

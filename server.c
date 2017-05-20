@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 int main(){
-    int sock;
+    int sock, new_sock;
     struct sockaddr_in sin;
     const int y = 1;
 
@@ -29,6 +29,18 @@ int main(){
 
     // Socket wartet auf eingehende Verbindungen
     listen(sock, 5);
+
+    addrlen = sizeof(struct sockaddr_in);
+
+    while(true){
+      new_sock = accept(sock, (struct sockaddr *) &address, &addrlen);
+      if(new_sock > 0){
+        printf("Der Client %s ist verbunden ...\n", inet_ntoa(address.sin_addr));
+      }
+      while(strcmp(buffer, "quit\n") != 0){
+        printf("Nachricht zum Versenden: ");
+      }
+    }
 
     // Socket schließen
     unlink((const char *) &sin);

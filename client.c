@@ -1,12 +1,16 @@
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#define BUF 1024
 
 int main(int argc, char **argv) {
-    int sock;
+    int sock, size;
+    char *buffer = malloc(BUF);
     struct sockaddr_in sin;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0) > 0)) {
@@ -26,7 +30,19 @@ int main(int argc, char **argv) {
       printf("keine Verbindung hergestellt\n");
     }
 
+    while(strcmp(buffer, "quit\n") != 0){
+      size = recv(sock, buffer, BUF-1, 0);
+      if(size > 0){
+        buffer[size] = '\0';
+      }
+      printf("Nachricht erhalten: %s\n", buffer);
+      if(strcmp(buffer, "quit\n")){
+        printf("Nachricht zum Versenden: ");
+        fgets(buffer, BUF, stdin);
+        send(sock, buffer, strlen(buffer), 0);
+      }
+    }
+
     close(sock);
-    printf("");
     return (EXIT_SUCCESS);
 }

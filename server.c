@@ -1,13 +1,19 @@
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#define BUF 1024
 
 int main(){
     int sock, new_sock;
+    socklen_t addrlen;
+    ssize_t size;
     struct sockaddr_in sin;
-    const int y = 1;
+    char *buffer = malloc(BUF);
 
     // Socket erzeugen
     if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0){
@@ -32,17 +38,25 @@ int main(){
 
     addrlen = sizeof(struct sockaddr_in);
 
-    while(true){
-      new_sock = accept(sock, (struct sockaddr *) &address, &addrlen);
+    while(1){
+      new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
       if(new_sock > 0){
-        printf("Der Client %s ist verbunden ...\n", inet_ntoa(address.sin_addr));
+        printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
       }
       while(strcmp(buffer, "quit\n") != 0){
         printf("Nachricht zum Versenden: ");
+        fgets(buffer, BUF, stdin);
+        send(new_sock, buffer, strlen(buffer), 0);
+        size = recv(new_sock, buffer, BUF-1, 0);
+        if(size > 0){
+          buffer[size] = '\0';
+        }
+        printf("Nachricht empfangen: %s\n", buffer);
       }
+      close(new_sock);
     }
 
     // Socket schließen
-    unlink((const char *) &sin);
+    close(sock);
     return (EXIT_SUCCESS);
 }

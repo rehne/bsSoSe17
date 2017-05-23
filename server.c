@@ -8,12 +8,15 @@
 #include <string.h>
 #define BUF 1024
 
+int strtoken(char *str, char *separator, char **token, int size);
+
 int main(){
     int sock, new_sock;
     socklen_t addrlen;
-    ssize_t size;
+    ssize_t size, function, string;
     struct sockaddr_in sin;
     char *buffer = malloc(BUF);
+    char str;
 
     // Socket erzeugen
     if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0){
@@ -40,14 +43,14 @@ int main(){
 
     while(1){
       new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
+
       if(new_sock > 0){
         printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
       }
       while(strcmp(buffer, "quit\n") != 0){
-        printf("Nachricht zum Versenden: ");
-        fgets(buffer, BUF, stdin);
-        send(new_sock, buffer, strlen(buffer), 0);
-        size = recv(new_sock, buffer, BUF-1, 0);
+        string = recv(new_sock, buffer, BUF-1, 0);
+        function = strtoken(buffer, " ", str, 3);
+
         if(size > 0){
           buffer[size] = '\0';
         }
@@ -59,4 +62,13 @@ int main(){
     // Socket schließen
     close(sock);
     return (EXIT_SUCCESS);
+}
+
+int strtoken(char *str, char *separator, char **token, int size){
+  int i = 0;
+  token[i] = strtok(str, separator);
+  while(token[i++] && i < size){
+    token[i] = strtok(NULL, separator);
+  }
+  return (i);
 }

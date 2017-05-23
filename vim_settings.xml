@@ -3,28 +3,43 @@
     <state version="4" enabled="true" />
     <globalmarks />
     <filemarks>
+      <file name="vim_settings.xml" timestamp="1494346511447">
+        <mark key="[" line="0" column="0" />
+      </file>
       <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/main.c" timestamp="1494323365540">
         <mark key="[" line="1" column="0" />
         <mark key="]" line="0" column="0" />
         <mark key="^" line="0" column="0" />
         <mark key="." line="0" column="0" />
       </file>
-      <file name="/Dummy.txt" timestamp="1495549931459">
+      <file name="/Dummy.txt" timestamp="1494345928156">
         <mark key="[" line="0" column="0" />
       </file>
-      <file name="$USER_HOME$/CLionProjects/BSSS17/bsSoSe17/server.c" timestamp="1495552392083">
-        <mark key="]" line="23" column="30" />
-        <mark key="." line="23" column="30" />
-        <mark key="^" line="23" column="30" />
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/server.c" timestamp="1494324811449">
+        <mark key="[" line="0" column="0" />
+      </file>
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/CMakeLists.txt" timestamp="1494345503826">
+        <mark key="[" line="5" column="17" />
+        <mark key="]" line="5" column="17" />
+        <mark key="." line="5" column="17" />
+      </file>
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/README.md" timestamp="1494347386875">
+        <mark key="[" line="5" column="0" />
+      </file>
+      <file name="/Volumes/VOLUME/sciebo/Semester6/BS/Praktikum/bsSoSe17/server.c" timestamp="1494345602196">
+        <mark key="[" line="0" column="0" />
       </file>
     </filemarks>
     <jumps />
     <registers>
       <register name="&quot;" type="4">
-        <text encoding="base64">Lmg+</text>
+        <text>main.</text>
       </register>
       <register name="-" type="4">
-        <text encoding="base64">Lmg+</text>
+        <text>main.</text>
+      </register>
+      <register name="/" type="4">
+        <text encoding="base64">XDwvXD4=</text>
       </register>
     </registers>
     <search>
@@ -32,34 +47,14 @@
       <show-last>false</show-last>
     </search>
     <history>
-      <history-search />
+      <history-search>
+        <entry encoding="base64">XDwvXD4=</entry>
+      </history-search>
       <history-cmd />
       <history-expr />
       <history-input />
     </history>
-    <shortcut-conflicts>
-      <shortcut-conflict owner="vim">
-        <text>ctrl pressed A</text>
-      </shortcut-conflict>
-      <shortcut-conflict owner="vim">
-        <text>ctrl pressed I</text>
-      </shortcut-conflict>
-      <shortcut-conflict owner="ide">
-        <text>ctrl pressed V</text>
-      </shortcut-conflict>
-      <shortcut-conflict owner="vim">
-        <text>ctrl pressed F</text>
-      </shortcut-conflict>
-      <shortcut-conflict owner="vim">
-        <text>ctrl pressed C</text>
-      </shortcut-conflict>
-      <shortcut-conflict owner="vim">
-        <text>ctrl pressed X</text>
-      </shortcut-conflict>
-      <shortcut-conflict owner="vim">
-        <text>ctrl pressed S</text>
-      </shortcut-conflict>
-    </shortcut-conflicts>
+    <shortcut-conflicts />
     <editor>
       <key-repeat enabled="false" />
     </editor>

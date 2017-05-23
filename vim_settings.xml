@@ -9,11 +9,14 @@
         <mark key="^" line="0" column="0" />
         <mark key="." line="0" column="0" />
       </file>
-      <file name="$USER_HOME$/CLionProjects/BSSS17/bsSoSe17/server.c" timestamp="1494415748155">
-        <mark key="[" line="4" column="19" />
-        <mark key="]" line="4" column="19" />
-        <mark key="." line="4" column="19" />
-        <mark key="^" line="15" column="0" />
+      <file name="/Dummy.txt" timestamp="1495549931459">
+        <mark key="[" line="0" column="0" />
+      </file>
+      <file name="$USER_HOME$/CLionProjects/BSSS17/bsSoSe17/server.c" timestamp="1495550393218">
+        <mark key="[" line="32" column="31" />
+        <mark key="]" line="32" column="30" />
+        <mark key="." line="32" column="30" />
+        <mark key="^" line="32" column="30" />
       </file>
     </filemarks>
     <jumps />

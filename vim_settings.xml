@@ -12,11 +12,10 @@
       <file name="/Dummy.txt" timestamp="1495549931459">
         <mark key="[" line="0" column="0" />
       </file>
-      <file name="$USER_HOME$/CLionProjects/BSSS17/bsSoSe17/server.c" timestamp="1495550393218">
-        <mark key="[" line="32" column="31" />
-        <mark key="]" line="32" column="30" />
-        <mark key="." line="32" column="30" />
-        <mark key="^" line="32" column="30" />
+      <file name="$USER_HOME$/CLionProjects/BSSS17/bsSoSe17/server.c" timestamp="1495552392083">
+        <mark key="]" line="23" column="30" />
+        <mark key="." line="23" column="30" />
+        <mark key="^" line="23" column="30" />
       </file>
     </filemarks>
     <jumps />

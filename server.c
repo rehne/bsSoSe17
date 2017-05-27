@@ -1,3 +1,5 @@
+// Verbindung mit telnet 127.0.0.1 4711 herstellen
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -7,8 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #define BUF 1024
-
-int strtoken(char *str, char *separator, char **token, int size);
+#define GET "GET"
+#define PUT "PUT"
+#define DELETE "DELETE"
 
 int main(){
     int sock, new_sock;
@@ -49,12 +52,25 @@ int main(){
       }
       while(strcmp(buffer, "quit\n") != 0){
         string = recv(new_sock, buffer, BUF-1, 0);
-        function = strtoken(buffer, " ", str, 3);
 
         if(size > 0){
           buffer[size] = '\0';
         }
-        printf("Nachricht empfangen: %s\n", buffer);
+
+        printf("%zd\n", string-2);
+
+        printf("Nachricht erhalten: %s", buffer);
+
+        // klappt noch nicht.. im buffer steht nicht das, was man in telnet schreibt
+        if(strcmp(buffer, "get") == 0){
+          printf("get klappt\n");
+        } else if(strcmp(buffer, "put") == 0){
+          printf("put klappt\n");
+        } else if(strcmp(buffer, "delete") == 0){
+          printf("delete klappt\n");
+        } else {
+          printf("klappt nicht\n");
+        }
       }
       close(new_sock);
     }
@@ -62,13 +78,4 @@ int main(){
     // Socket schließen
     close(sock);
     return (EXIT_SUCCESS);
-}
-
-int strtoken(char *str, char *separator, char **token, int size){
-  int i = 0;
-  token[i] = strtok(str, separator);
-  while(token[i++] && i < size){
-    token[i] = strtok(NULL, separator);
-  }
-  return (i);
 }

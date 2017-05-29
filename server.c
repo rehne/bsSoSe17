@@ -10,6 +10,8 @@
 #include <string.h>
 #define BUF 1024
 
+int strtoken(char *str, char *separator, char **token, int size);
+
 int main(){
     int sock, new_sock;
     socklen_t addrlen;
@@ -20,6 +22,7 @@ int main(){
     char *get = "GET";
     char *put = "PUT";
     char *del = "DEL";
+    char **result = malloc(100);
 
     // Initialisieren vom struct sin mit geeigneten Werten
     int sin_len = sizeof(sin);
@@ -43,53 +46,54 @@ int main(){
     listen(sock, 5);
 
     while(1){
+
       new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
 
-      if(new_sock > 0){
-        printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
+      if(fork() == 0){
+
+              if(new_sock > 0){
+                printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
+              }
+              while(strncmp(buffer, quit, 4) != 0){
+                string = recv(new_sock, buffer, BUF-1, 0);
+
+                if(size > 0){
+                  buffer[size] = '\0';
+                }
+
+                printf("Nachricht erhalten: %s", buffer);
+
+                if(strncmp(buffer, get, 3) == 0){
+                  printf("GET Funktion !\n");
+
+                } else if(strncmp(buffer, put, 3) == 0){
+                  printf("PUT Funktion !\n");
+
+                  int count = strtoken(buffer, " ", result, 3);
+                  for (int i = 0; i <= count; i++) {
+                    printf("Ergebnis: %s\n", result[i]);
+                  }
+                } else if(strncmp(buffer, del, 3) == 0){
+                  printf("DELETE Funktion !\n");
+
+                } else {
+                  printf("klappt nicht\n");
+                }
+              }
       }
-      while(strncmp(buffer, quit, 4) != 0){
-        string = recv(new_sock, buffer, BUF-1, 0);
 
-        if(size > 0){
-          buffer[size] = '\0';
-        }
-
-        printf("%zd\n", string-2);
-
-        printf("Nachricht erhalten: %s", buffer);
-
-        // klappt noch nicht.. im buffer steht nicht das, was man in telnet schreibt
-        if(strncmp(buffer, get, 3) == 0){
-          printf("get klappt\n");
-
-
-
-
-
-        } else if(strncmp(buffer, put, 3) == 0){
-          printf("put klappt\n");
-
-
-
-
-
-
-        } else if(strncmp(buffer, del, 3) == 0){
-          printf("delete klappt\n");
-
-
-
-
-          
-        } else {
-          printf("klappt nicht\n");
-        }
-      }
       close(new_sock);
     }
 
     // Socket schließen
     close(sock);
     return (EXIT_SUCCESS);
+}
+
+int strtoken(char *str, char *separator, char **token, int size) {
+    int i=0;
+    token[0] = strtok(str, separator);
+    while(token[i++] && i < size)
+        token[i] = strtok(NULL, separator);
+    return (i);
 }

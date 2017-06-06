@@ -30,6 +30,8 @@ int main(){
     char **result = malloc(100);
     char search[10];
 
+    int listenVar;
+
     // Shared Memory Segmet anfordern, anhängen und auf 0 setzen
     id = shmget(IPC_PRIVATE, SEGSIZE, IPC_CREAT|0777);
     shar_mem = (int *)shmat(id, 0, 0);
@@ -54,7 +56,10 @@ int main(){
     }
 
     // Socket lauscht auf eingehende Verbindungen
-    listen(sock, 5);
+    listenVar = listen(sock, 5);
+    if (listenVar < 0) {
+      perror("Error on listen");
+    }
 
     while(1){
 
@@ -66,6 +71,8 @@ int main(){
 
       KeyValue keyValues[100];
 
+      int counter = 0;
+
       new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
 
       if(fork() == 0){
@@ -74,7 +81,6 @@ int main(){
           printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
         }
         while(strncmp(buffer, quit, 4) != 0){
-          int counter = 0;
 
           string = recv(new_sock, buffer, BUF-1, 0);
 
@@ -85,8 +91,12 @@ int main(){
           // GET
           if (strncmp(buffer, get, 3) == 0) {
             int count = strtoken(buffer, " ", result, 2);
+
+            printf("keyValues i%s\n", keyValues[0].key);
+            printf("result%s\n", result[1]);
+
             for (int i = 0; i <= counter; i++) {
-              if(strcmp(keyValues[i].key, result[1])){
+              if(strcmp(keyValues[i].key, result[1]) == 0){
                 printf("Key gefunden: %s\n", keyValues[i].value);
               } else {
                 printf("den key gibbet nich\n");

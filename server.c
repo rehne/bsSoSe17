@@ -34,7 +34,7 @@ int main() {
     int id, *shar_mem;
     int pid;
     socklen_t addrlen;
-    ssize_t size, string;
+    size_t size, string;
     struct sockaddr_in sin;
     char *buffer = malloc(BUF);
     char *quit = "quit";
@@ -74,7 +74,7 @@ int main() {
       perror("Error on listen");
     }
 
-    while(1) {
+    while(strncmp(buffer, quit, 4) != 0) {
       new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
 
       if(fork() == 0) {
@@ -97,14 +97,14 @@ int main() {
               write(new_sock, keyValues[temp].value, sizeof(keyValues[temp].value));
             } else if(temp == (-1)) {
               //printf( "in GET Ende drin\n");
-              write(new_sock, "value not found!\n", 16);
+              write(new_sock, "value not found!\n", 17);
             }
 
           // PUT
           } else if (strncmp(buffer, put, 3) == 0) {
             fput(buffer, counter);
-            counter++;
             printf("Counter %i\n",counter );
+            counter++;
 
           // DELETE
           } else if (strncmp(buffer, del, 3) == 0) {
@@ -135,6 +135,7 @@ void fput(char* buffer, int counter){
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
   deleteSpaces(result[1], " ");
+  //result[1] = "\0";
   strcpy(keyValues[counter].key, result[1]);
   printf("Key gespeichert: %s\n", keyValues[counter].key);
   strcpy(keyValues[counter].value, result[2]);
@@ -153,10 +154,9 @@ int fget(char* buffer, int counter){
     if(strcmp(keyValues[i].key, result[1]) == 0){
       printf("Key gefunden: %s\n", keyValues[i].value);
       return i;
-    } else {
-      return -1;
     }
   }
+  return -1;
 }
 
 int fdel(char* buffer, int counter){

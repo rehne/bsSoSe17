@@ -13,9 +13,23 @@
 #define SEGSIZE sizeof(int)
 #define BUF 1024
 
-int strtoken(char *str, char *separator, char **token, int size);
+int counter = 0;
 
-int main(){
+
+// Struct & Array erzeugen
+typedef struct KeyValue_ {
+  char key[128];
+  char value[128];
+} KeyValue;
+KeyValue keyValues[100];
+
+int strtoken(char *str, char *separator, char **token, int size);
+int fget(char* buffer, int counter);
+void fput(char* buffer, int counter);
+int fdel(char* buffer, int counter);
+void deleteSpaces(char* in, char *separator);
+
+int main() {
     int sock, new_sock;
     int id, *shar_mem;
     int pid;
@@ -27,7 +41,6 @@ int main(){
     char *get = "GET";
     char *put = "PUT";
     char *del = "DEL";
-    char **result = malloc(100);
     char search[10];
 
     int listenVar;
@@ -44,12 +57,12 @@ int main(){
     sin.sin_port = htons(4711); // 4711 ist die Portangabe
 
     // Socket erzeugen
-    if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0){
+    if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0) {
       printf("Socket (%i) wurde angelegt!\n", sock);
     }
 
     // Socket binden
-    if(bind(sock, (struct sockaddr *)& sin, sizeof(sin)) == 0){
+    if(bind(sock, (struct sockaddr *)& sin, sizeof(sin)) == 0) {
       printf("Socket (%i) wurde gebunden!\n", sock);
     } else {
       printf("Der Port ist nicht frei - belegt!\n");
@@ -61,60 +74,41 @@ int main(){
       perror("Error on listen");
     }
 
-    while(1){
-
-      // Struct & Array erzeugen
-      typedef struct KeyValue_ {
-        char key[128];
-        char value[128];
-      } KeyValue;
-
-      KeyValue keyValues[100];
-
-      int counter = 0;
-
+    while(1) {
       new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
 
-      if(fork() == 0){
+      if(fork() == 0) {
 
-        if(new_sock > 0){
+        if(new_sock > 0) {
           printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
         }
-        while(strncmp(buffer, quit, 4) != 0){
 
-          string = recv(new_sock, buffer, BUF-1, 0);
+        while(strncmp(buffer, quit, 4) != 0) {
+          size = read(new_sock, buffer, BUF-1);
 
-          if(size > 0){
+          if(size > 0) {
             buffer[size] = '\0';
           }
 
           // GET
           if (strncmp(buffer, get, 3) == 0) {
-            int count = strtoken(buffer, " ", result, 2);
-
-            printf("keyValues i%s\n", keyValues[0].key);
-            printf("result%s\n", result[1]);
-
-            for (int i = 0; i <= counter; i++) {
-              if(strcmp(keyValues[i].key, result[1]) == 0){
-                printf("Key gefunden: %s\n", keyValues[i].value);
-              } else {
-                printf("den key gibbet nich\n");
-              }
+            int temp = fget(buffer, counter);
+            if(temp >=0) {
+              write(new_sock, keyValues[temp].value, sizeof(keyValues[temp].value));
+            } else if(temp == (-1)) {
+              //printf( "in GET Ende drin\n");
+              write(new_sock, "value not found!\n", 16);
             }
 
           // PUT
           } else if (strncmp(buffer, put, 3) == 0) {
-            int count = strtoken(buffer, " ", result, 3);
-            strcpy(keyValues[counter].key, result[1]);
-            printf("Key gespeichert: %s\n", keyValues[counter].key);
-            strcpy(keyValues[counter].value, result[2]);
-            printf("Value gespeichert: %s\n", keyValues[counter].value);
+            fput(buffer, counter);
             counter++;
+            printf("Counter %i\n",counter );
 
           // DELETE
           } else if (strncmp(buffer, del, 3) == 0) {
-
+            printf("delete Funktion aufgerufen\n");
           } else {
             printf("keine gültige Funktion aufgerufen\n");
           }
@@ -134,4 +128,45 @@ int strtoken(char *str, char *separator, char **token, int size) {
     while(token[i++] && i < size)
         token[i] = strtok(NULL, separator);
     return (i);
+}
+
+void fput(char* buffer, int counter){
+  char **result = malloc(100);
+  printf("PUT Funktion Aufgerufen\n");
+  int temp = strtoken(buffer, " ", result, 3);
+  deleteSpaces(result[1], " ");
+  strcpy(keyValues[counter].key, result[1]);
+  printf("Key gespeichert: %s\n", keyValues[counter].key);
+  strcpy(keyValues[counter].value, result[2]);
+  printf("Value gespeichert: %s\n", keyValues[counter].value);
+}
+
+int fget(char* buffer, int counter){
+  char **result = malloc(100);
+  printf("GET Funktion Aufgerufen\n");
+  int count = strtoken(buffer, " ", result, 2);
+
+  //printf("keyValues %s\n", keyValues[0].key);
+  //printf("result %s\n", result[1]);
+
+  for (int i = 0; i <= counter; i++) {
+    if(strcmp(keyValues[i].key, result[1]) == 0){
+      printf("Key gefunden: %s\n", keyValues[i].value);
+      return i;
+    } else {
+      return -1;
+    }
+  }
+}
+
+int fdel(char* buffer, int counter){
+
+}
+void deleteSpaces(char* in, char *separator){
+    char *pin = in, *out = in;
+    while(*pin){
+        *out = *pin++;
+        out += (*out != *separator);
+    }
+    *out = '\0';
 }

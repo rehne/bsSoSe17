@@ -58,7 +58,7 @@ int main(){
 
     while(1){
 
-      // Array erzeugen
+      // Struct & Array erzeugen
       typedef struct KeyValue_ {
         char key[128];
         char value[128];

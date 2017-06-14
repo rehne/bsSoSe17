@@ -24,9 +24,9 @@ typedef struct KeyValue_ {
 KeyValue keyValues[100];
 
 int strtoken(char *str, char *separator, char **token, int size);
-int fget(char* buffer, int counter);
-void fput(char* buffer, int counter);
-int fdel(char* buffer, int counter);
+int get(char* buffer, int counter);
+void put(char* buffer, int counter);
+int del(char* buffer, int counter);
 void deleteSpaces(char* in, char *separator);
 
 int main() {
@@ -38,9 +38,9 @@ int main() {
     struct sockaddr_in sin;
     char *buffer = malloc(BUF);
     char *quit = "quit";
-    char *get = "GET";
-    char *put = "PUT";
-    char *del = "DEL";
+    char *stringGet = "GET";
+    char *stringPut = "PUT";
+    char *stringDel = "DEL";
     char search[10];
 
     int listenVar;
@@ -91,9 +91,9 @@ int main() {
           }
 
           // GET
-          if (strncmp(buffer, get, 3) == 0) {
-            int temp = fget(buffer, counter);
-            if(temp >=0) {
+          if (strncmp(buffer, stringGet, 3) == 0) {
+            int temp = get(buffer, counter);
+            if(temp >= 0) {
               write(new_sock, keyValues[temp].value, sizeof(keyValues[temp].value));
             } else if(temp == (-1)) {
               //printf( "in GET Ende drin\n");
@@ -101,14 +101,14 @@ int main() {
             }
 
           // PUT
-          } else if (strncmp(buffer, put, 3) == 0) {
-            fput(buffer, counter);
-            printf("Counter %i\n",counter );
-            counter++;
+          } else if (strncmp(buffer, stringPut, 3) == 0) {
+              put(buffer, counter);
+              printf("Counter %i\n", counter );
+              counter++;
 
-          // DELETE
-          } else if (strncmp(buffer, del, 3) == 0) {
-            printf("delete Funktion aufgerufen\n");
+            // DELETE
+          } else if (strncmp(buffer, stringDel, 3) == 0) {
+            del(buffer, counter);
           } else {
             printf("keine gültige Funktion aufgerufen\n");
           }
@@ -123,14 +123,14 @@ int main() {
 }
 
 int strtoken(char *str, char *separator, char **token, int size) {
-    int i=0;
-    token[0] = strtok(str, separator);
-    while(token[i++] && i < size)
-        token[i] = strtok(NULL, separator);
-    return (i);
+  int i = 0;
+  token[0] = strtok(str, separator);
+  while(token[i++] && i < size)
+    token[i] = strtok(NULL, separator);
+  return (i);
 }
 
-void fput(char* buffer, int counter){
+void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
@@ -142,7 +142,7 @@ void fput(char* buffer, int counter){
   printf("Value gespeichert: %s\n", keyValues[counter].value);
 }
 
-int fget(char* buffer, int counter){
+int get(char* buffer, int counter) {
   char **result = malloc(100);
   printf("GET Funktion Aufgerufen\n");
   int count = strtoken(buffer, " ", result, 2);
@@ -151,7 +151,7 @@ int fget(char* buffer, int counter){
   //printf("result %s\n", result[1]);
 
   for (int i = 0; i <= counter; i++) {
-    if(strcmp(keyValues[i].key, result[1]) == 0){
+    if(strcmp(keyValues[i].key, result[1]) == 0) {
       printf("Key gefunden: %s\n", keyValues[i].value);
       return i;
     }
@@ -159,14 +159,15 @@ int fget(char* buffer, int counter){
   return -1;
 }
 
-int fdel(char* buffer, int counter){
-
+int del(char* buffer, int counter) {
+  printf("DELETE Funktion\n");
+  return counter;
 }
-void deleteSpaces(char* in, char *separator){
-    char *pin = in, *out = in;
-    while(*pin){
-        *out = *pin++;
-        out += (*out != *separator);
-    }
-    *out = '\0';
+void deleteSpaces(char* in, char *separator) {
+  char *pin = in, *out = in;
+  while(*pin){
+    *out = *pin++;
+    out += (*out != *separator);
+  }
+  *out = '\0';
 }

@@ -1,6 +1,6 @@
-## Betriebssysteme und verteilte System | Sommersemester 2017
+## Betriebssysteme und verteilte Systeme | Sommersemester 2017
 
-von Christian Krenn und René Honnen
+von [Christian Krenn](https://github.com/cuhater) und [René Honnen](https://github.com/rehne/)
 
 - - -
 

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #define SEGSIZE sizeof(int)
 #define BUF 1024
 
@@ -94,23 +95,46 @@ int main() {
           if (strncmp(buffer, stringGet, 3) == 0) {
             int temp = get(buffer, counter);
             if(temp >= 0) {
+              write(new_sock, "Meldung: Key gefunden!\n", 22);
               write(new_sock, keyValues[temp].value, sizeof(keyValues[temp].value));
             } else if(temp == (-1)) {
               //printf( "in GET Ende drin\n");
-              write(new_sock, "value not found!\n", 17);
+              write(new_sock, "Fehler: Kein Key gefunden!\n", 26);
             }
 
           // PUT
           } else if (strncmp(buffer, stringPut, 3) == 0) {
+            /*
+              if(counter > 0){
+              int proof = get(buffer, counter);
+              if(proof >= 0){
+              put(buffer, proof);
+              printf("Counter %i\n", proof );
+            }else if(proof == -1){
               put(buffer, counter);
               printf("Counter %i\n", counter );
               counter++;
 
+            }
+          } */
+              //else
+              //{
+              put(buffer, counter);
+              printf("Counter %i\n", counter );
+              counter++;
+              //}
+
             // DELETE
           } else if (strncmp(buffer, stringDel, 3) == 0) {
             del(buffer, counter);
+          } else if(strncmp(buffer, quit, 4) == 0) {
+            printf("Meldung: Server wird beendet und Socket freigegeben\n");
+            write(new_sock, "Meldung: Server wird beendet und Socket freigegeben\n", 53);
+            sleep(5);
+            break;
           } else {
-            printf("keine gültige Funktion aufgerufen\n");
+            printf("Fehler: Keine gültige Funktion aufgerufen\n");
+            write(new_sock, "Fehler: Keine gültige Funktion aufgerufen\n", 43);
           }
         }
       }
@@ -120,7 +144,7 @@ int main() {
     // Socket schließen
     close(sock);
     return (EXIT_SUCCESS);
-}
+    }
 
 int strtoken(char *str, char *separator, char **token, int size) {
   int i = 0;
@@ -134,7 +158,7 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
-  deleteSpaces(result[1], " ");
+  //deleteSpaces(result[1], " ");
   //result[1] = "\0";
   strcpy(keyValues[counter].key, result[1]);
   printf("Key gespeichert: %s\n", keyValues[counter].key);
@@ -154,6 +178,7 @@ int get(char* buffer, int counter) {
     if(strcmp(keyValues[i].key, result[1]) == 0) {
       printf("Key gefunden: %s\n", keyValues[i].value);
       return i;
+      printf("TESCHT %i\n", i);
     }
   }
   return -1;

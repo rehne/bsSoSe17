@@ -15,7 +15,6 @@
 
 int counter = 0;
 
-
 // Struct & Array erzeugen
 typedef struct KeyValue_ {
   char key[128];
@@ -96,7 +95,6 @@ int main() {
             if(temp >= 0) {
               write(new_sock, keyValues[temp].value, sizeof(keyValues[temp].value));
             } else if(temp == (-1)) {
-              //printf( "in GET Ende drin\n");
               write(new_sock, "value not found!\n", 17);
             }
 
@@ -135,7 +133,6 @@ void put(char* buffer, int counter) {
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
   deleteSpaces(result[1], " ");
-  //result[1] = "\0";
   strcpy(keyValues[counter].key, result[1]);
   printf("Key gespeichert: %s\n", keyValues[counter].key);
   strcpy(keyValues[counter].value, result[2]);
@@ -146,9 +143,6 @@ int get(char* buffer, int counter) {
   char **result = malloc(100);
   printf("GET Funktion Aufgerufen\n");
   int count = strtoken(buffer, " ", result, 2);
-
-  //printf("keyValues %s\n", keyValues[0].key);
-  //printf("result %s\n", result[1]);
 
   for (int i = 0; i <= counter; i++) {
     if(strcmp(keyValues[i].key, result[1]) == 0) {

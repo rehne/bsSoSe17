@@ -26,6 +26,7 @@ KeyValue keyValues[100];
 int strtoken(char *str, char *separator, char **token, int size);
 int get(char* buffer, int counter);
 void put(char* buffer, int counter);
+int getput(char* buffer, int counter);
 int del(char* buffer, int counter);
 void deleteSpaces(char* in, char *separator);
 
@@ -104,9 +105,9 @@ int main() {
 
           // PUT
           } else if (strncmp(buffer, stringPut, 3) == 0) {
-            /*
+/*Ü
               if(counter > 0){
-              int proof = get(buffer, counter);
+              int proof = getput(buffer, counter);
               if(proof >= 0){
               put(buffer, proof);
               printf("Counter %i\n", proof );
@@ -116,9 +117,9 @@ int main() {
               counter++;
 
             }
-          } */
-              //else
-              //{
+          }
+              else
+              {*/
               put(buffer, counter);
               printf("Counter %i\n", counter );
               counter++;
@@ -158,13 +159,26 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
-  deleteSpaces(result[1], " ");
-  //deleteSpaces(result[1], " ");
-  //result[1] = "\0";
+  if(counter < 0)
+  {
+  int proof = getput(buffer, counter);
+  if(proof <= 0)
+  {
+    printf("Wurstkopf");
+  }
+  else if(proof == -1)
+  {
+    printf("GETPUT nicht geklappt");
+  }
+  }
+  else
+  {
   strcpy(keyValues[counter].key, result[1]);
   printf("Key gespeichert: %s\n", keyValues[counter].key);
   strcpy(keyValues[counter].value, result[2]);
   printf("Value gespeichert: %s\n", keyValues[counter].value);
+  }
+
 }
 
 int get(char* buffer, int counter) {
@@ -181,6 +195,24 @@ int get(char* buffer, int counter) {
   }
   return -1;
 }
+int getput(char* buffer, int counter) {
+  char **result = malloc(100);
+  printf("GETPUT Funktion Aufgerufen\n");
+  int count = strtoken(buffer, " ", result, 3);
+  //printf("Kommt er bis hier?\n");
+  for (int i = 0; i <= counter; i++) {
+    //printf("Kommt er bis hier FOR?\n")
+    if(strcmp(keyValues[i].key, result[1]) == 0) {
+      printf("TESCHT %i\n", i);
+      return i;
+
+    } else {
+      printf("TESCHT else\n");
+    }
+  }
+  return -1;
+}
+
 
 int del(char* buffer, int counter) {
   printf("DELETE Funktion\n");

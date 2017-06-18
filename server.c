@@ -15,7 +15,6 @@
 
 int counter = 0;
 
-
 // Struct & Array erzeugen
 typedef struct KeyValue_ {
   char key[128];
@@ -43,8 +42,6 @@ int main() {
     char *stringDel = "DEL";
     char search[10];
 
-    int listenVar;
-
     // Shared Memory Segmet anfordern, anhängen und auf 0 setzen
     id = shmget(IPC_PRIVATE, SEGSIZE, IPC_CREAT|0777);
     shar_mem = (int *)shmat(id, 0, 0);
@@ -69,7 +66,7 @@ int main() {
     }
 
     // Socket lauscht auf eingehende Verbindungen
-    listenVar = listen(sock, 5);
+    int listenVar = listen(sock, 5);
     if (listenVar < 0) {
       perror("Error on listen");
     }

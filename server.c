@@ -138,7 +138,7 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
-  if(counter < 0) {
+  if(counter > 0) {
     int proof = get(buffer, counter);
     if(proof >= 0) {
       printf("juhu");

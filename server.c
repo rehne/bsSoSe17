@@ -26,6 +26,7 @@ KeyValue keyValues[100];
 
 int strtoken(char *str, char *separator, char **token, int size);
 int get(char* buffer, int counter);
+int getput(char* buffer, int counter);
 void put(char* buffer, int counter);
 int del(char* buffer, int counter);
 void deleteSpaces(char* in, char *separator);
@@ -38,6 +39,7 @@ int main() {
     size_t size, string;
     struct sockaddr_in sin;
     char *buffer = malloc(BUF);
+    char *buffertmp = malloc(BUF);
     char *quit = "quit";
     char *stringGet = "GET";
     char *stringPut = "PUT";
@@ -103,26 +105,38 @@ int main() {
             }
 
           // PUT
-          } else if (strncmp(buffer, stringPut, 3) == 0) {
-            /*
-              if(counter > 0){
-              int proof = get(buffer, counter);
-              if(proof >= 0){
-              put(buffer, proof);
-              printf("Counter %i\n", proof );
-            }else if(proof == -1){
-              put(buffer, counter);
-              printf("Counter %i\n", counter );
-              counter++;
 
-            }
-          } */
-              //else
-              //{
-              put(buffer, counter);
-              printf("Counter %i\n", counter );
-              counter++;
-              //}
+          } else if (strncmp(buffer, stringPut, 3) == 0) {
+
+              if(counter > 0)
+              {
+                buffertmp = buffer;
+                printf("Buffer: %s\n", buffer );
+                printf("BufferTMP: %s\n", buffertmp );
+                int proof = getput(buffertmp, counter);
+                printf("Proof %i\n", proof );
+                if(proof >= 0)
+                {
+                  printf("Proof2 %i\n", proof );
+                  put(buffer, proof);
+                }
+                else if (proof == -1)
+                {
+                  printf("Buffer: %s\n", buffer );
+                  printf("BufferTMP: %s\n", buffer );
+                  printf("Counter vor insert %i\n", counter );
+                  put(buffer, counter);
+                  printf("Counter %i\n", counter );
+                  counter++;
+                }
+
+              }
+              else
+              {
+                put(buffer, counter);
+                printf("Counter %i\n", counter );
+                counter++;
+              }
 
             // DELETE
           } else if (strncmp(buffer, stringDel, 3) == 0) {
@@ -158,9 +172,11 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
-  //deleteSpaces(result[1], " ");
-  //result[1] = "\0";
+  printf("Testfeld\n");
+  printf("Key lautet %s\n", result[1]);
+  printf("Value lautet %s\n", result[2]);
   strcpy(keyValues[counter].key, result[1]);
+
   printf("Key gespeichert: %s\n", keyValues[counter].key);
   strcpy(keyValues[counter].value, result[2]);
   printf("Value gespeichert: %s\n", keyValues[counter].value);
@@ -170,10 +186,6 @@ int get(char* buffer, int counter) {
   char **result = malloc(100);
   printf("GET Funktion Aufgerufen\n");
   int count = strtoken(buffer, " ", result, 2);
-
-  //printf("keyValues %s\n", keyValues[0].key);
-  //printf("result %s\n", result[1]);
-
   for (int i = 0; i <= counter; i++) {
     if(strcmp(keyValues[i].key, result[1]) == 0) {
       printf("Key gefunden: %s\n", keyValues[i].value);
@@ -183,7 +195,19 @@ int get(char* buffer, int counter) {
   }
   return -1;
 }
-
+int getput(char* buffertmp, int counter) {
+  char **result = malloc(100);
+  printf("GETPUT Funktion Aufgerufen\n");
+  int count = strtoken(buffertmp, " ", result, 3);
+  for (int i = 0; i <= counter; i++) {
+    if(strcmp(keyValues[i].key, result[1]) == 0) {
+      printf("Key gefunden: %s\n", keyValues[i].value);
+      return i;
+      printf("TESCHT %i\n", i);
+    }
+  }
+  return -1;
+}
 int del(char* buffer, int counter) {
   printf("DELETE Funktion\n");
   return counter;

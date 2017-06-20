@@ -16,7 +16,6 @@
 
 int counter = 0;
 
-
 // Struct & Array erzeugen
 typedef struct KeyValue_ {
   char key[128];
@@ -28,6 +27,7 @@ int strtoken(char *str, char *separator, char **token, int size);
 int get(char* buffer, int counter);
 int getput(char* buffer, int counter);
 void put(char* buffer, int counter);
+int getput(char* buffer, int counter);
 int del(char* buffer, int counter);
 void deleteSpaces(char* in, char *separator);
 
@@ -45,8 +45,6 @@ int main() {
     char *stringPut = "PUT";
     char *stringDel = "DEL";
     char search[10];
-
-    int listenVar;
 
     // Shared Memory Segmet anfordern, anhängen und auf 0 setzen
     id = shmget(IPC_PRIVATE, SEGSIZE, IPC_CREAT|0777);
@@ -72,16 +70,14 @@ int main() {
     }
 
     // Socket lauscht auf eingehende Verbindungen
-    listenVar = listen(sock, 5);
-    if (listenVar < 0) {
+    // int listenVar = listen(sock, 5);
+    if (listen(sock, 5) < 0) {
       perror("Error on listen");
     }
 
     while(strncmp(buffer, quit, 4) != 0) {
       new_sock = accept(sock, (struct sockaddr *) &sin, &addrlen);
-
       if(fork() == 0) {
-
         if(new_sock > 0) {
           printf("Der Client %s ist verbunden ...\n", inet_ntoa(sin.sin_addr));
         }
@@ -97,16 +93,17 @@ int main() {
           if (strncmp(buffer, stringGet, 3) == 0) {
             int temp = get(buffer, counter);
             if(temp >= 0) {
-              write(new_sock, "Meldung: Key gefunden!\n", 22);
+              write(new_sock, "Meldung: Key gefunden: ", 23);
               write(new_sock, keyValues[temp].value, sizeof(keyValues[temp].value));
             } else if(temp == (-1)) {
-              //printf( "in GET Ende drin\n");
+              write(new_sock, "value not found!\n", 17);
               write(new_sock, "Fehler: Kein Key gefunden!\n", 26);
             }
 
           // PUT
 
           } else if (strncmp(buffer, stringPut, 3) == 0) {
+<<<<<<< HEAD
 
               if(counter > 0)
               {
@@ -137,6 +134,11 @@ int main() {
                 printf("Counter %i\n", counter );
                 counter++;
               }
+=======
+              put(buffer, counter);
+              printf("Counter %i\n", counter );
+              counter++;
+>>>>>>> bf2d1eb623264d66649611be18365786a53e6be1
 
             // DELETE
           } else if (strncmp(buffer, stringDel, 3) == 0) {
@@ -172,20 +174,36 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
+<<<<<<< HEAD
   printf("Testfeld\n");
   printf("Key lautet %s\n", result[1]);
   printf("Value lautet %s\n", result[2]);
+=======
+  if(counter < 0) {
+    int proof = get(buffer, counter);
+    if(proof >= 0) {
+      printf("juhu");
+    } else if(proof == -1) {
+      printf("GETAufruf nicht geklappt");
+    }
+  } else {
+>>>>>>> bf2d1eb623264d66649611be18365786a53e6be1
   strcpy(keyValues[counter].key, result[1]);
 
   printf("Key gespeichert: %s\n", keyValues[counter].key);
   strcpy(keyValues[counter].value, result[2]);
   printf("Value gespeichert: %s\n", keyValues[counter].value);
+  }
 }
 
 int get(char* buffer, int counter) {
   char **result = malloc(100);
   printf("GET Funktion Aufgerufen\n");
   int count = strtoken(buffer, " ", result, 2);
+<<<<<<< HEAD
+=======
+
+>>>>>>> bf2d1eb623264d66649611be18365786a53e6be1
   for (int i = 0; i <= counter; i++) {
     if(strcmp(keyValues[i].key, result[1]) == 0) {
       printf("Key gefunden: %s\n", keyValues[i].value);

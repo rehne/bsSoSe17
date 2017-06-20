@@ -103,7 +103,6 @@ int main() {
           // PUT
 
           } else if (strncmp(buffer, stringPut, 3) == 0) {
-<<<<<<< HEAD
 
               if(counter > 0)
               {
@@ -134,11 +133,6 @@ int main() {
                 printf("Counter %i\n", counter );
                 counter++;
               }
-=======
-              put(buffer, counter);
-              printf("Counter %i\n", counter );
-              counter++;
->>>>>>> bf2d1eb623264d66649611be18365786a53e6be1
 
             // DELETE
           } else if (strncmp(buffer, stringDel, 3) == 0) {
@@ -174,20 +168,9 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion Aufgerufen\n");
   int temp = strtoken(buffer, " ", result, 3);
-<<<<<<< HEAD
   printf("Testfeld\n");
   printf("Key lautet %s\n", result[1]);
   printf("Value lautet %s\n", result[2]);
-=======
-  if(counter < 0) {
-    int proof = get(buffer, counter);
-    if(proof >= 0) {
-      printf("juhu");
-    } else if(proof == -1) {
-      printf("GETAufruf nicht geklappt");
-    }
-  } else {
->>>>>>> bf2d1eb623264d66649611be18365786a53e6be1
   strcpy(keyValues[counter].key, result[1]);
 
   printf("Key gespeichert: %s\n", keyValues[counter].key);
@@ -200,10 +183,6 @@ int get(char* buffer, int counter) {
   char **result = malloc(100);
   printf("GET Funktion Aufgerufen\n");
   int count = strtoken(buffer, " ", result, 2);
-<<<<<<< HEAD
-=======
-
->>>>>>> bf2d1eb623264d66649611be18365786a53e6be1
   for (int i = 0; i <= counter; i++) {
     if(strcmp(keyValues[i].key, result[1]) == 0) {
       printf("Key gefunden: %s\n", keyValues[i].value);

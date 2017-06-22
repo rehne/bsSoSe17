@@ -10,7 +10,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/shm.h>
+#include <sys/sem.h>
 #include <sys/ipc.h>
+#include <sys/wait.h>
 #define BUF 1024
 #define SEGSIZE sizeof(keyValues)
 
@@ -75,6 +77,25 @@ int main() {
     printf("Server bereit\n");
   }
 
+  unsigned short marker[1]; // aus technischen Gründen
+
+  // Semaphore für den Zugriff auf readcounter
+  int mutex = semget(IPC_PRIVATE, 1, IPC_CREAT|0777);
+  if(mutex == -1){
+    perror("Die Gruppe mutex konnte nicht angelegt werden!");
+    exit(1);
+  }
+  int db = semget(IPC_PRIVATE, 1, IPC_CREAT|0777);
+  if(db == -1){
+    perror("Die Gruppe db konnte nicht angelegt werden!");
+    exit(1);
+  }
+
+  // Semaphoren auf 1 setzen
+  marker[0] = 1;
+  semctl(mutex, 1, SETALL, marker);
+  semctl(db, 1, SETALL, marker);
+
   // Shared Memory, neues Segment anlegen oder auf bestehendes Segment zurückgreifen
   int id = shmget(IPC_PRIVATE, sizeof(KeyValueWrapper), IPC_CREAT|0777);
   if(id < 0) {
@@ -86,6 +107,7 @@ int main() {
   // Segment an Adressraum des Prozesses anhängen
   KeyValue_Wrapper = shmat(id, 0, 0);
   KeyValue_Wrapper->counter = 0;
+  KeyValue_Wrapper->readcounter = 0;
 
   while(1) {
     new_sock = accept(sock, (struct sockaddr *) &server, &addrlen);
@@ -96,6 +118,12 @@ int main() {
         printf("Client %s ist verbunden ...\n", inet_ntoa(server.sin_addr));
       }
 
+      struct sembuf enter, leave;               // structs für den Semaphor
+      enter.sem_num = leave.sem_num = 0;        // Semaphor 0 in der Gruppe
+      enter.sem_flg = leave.sem_flg = SEM_UNDO;
+      enter.sem_op = -1;                        // blockieren, DOWN-Operation
+      leave.sem_op = 1;                         // freigeben, UP-Operation
+
       while(strncmp(buffer, quit, 4) != 0) {
         int size = read(new_sock, buffer, BUF-1);
         if(size > 0) {
@@ -104,21 +132,37 @@ int main() {
 
         // GET
         if (strncmp(buffer, stringGet, 3) == 0) {
+          semop(mutex, &enter, 1);              // Eintritt in kritischen Bereich
+          KeyValue_Wrapper->readcounter += 1;
+          if(KeyValue_Wrapper->readcounter == 1){
+            semop(db, &enter, 1);
+          }
+          semop(mutex, &leave, 1);
           int getValue = get(buffer, KeyValue_Wrapper->counter);
           if(getValue >= 0) {
             write(new_sock, KeyValue_Wrapper->keyValues[getValue].value, sizeof(KeyValue_Wrapper->keyValues[getValue].value));
           } else if(getValue == -1) {
             write(new_sock, "Fehler: Kein Value gefunden!\n", 29);
           }
+          semop(mutex, &enter, 1);
+          KeyValue_Wrapper->readcounter -= 1;
+          if(KeyValue_Wrapper->readcounter == 0){
+            semop(db, &leave, 1);
+          }
+          semop(mutex, &leave, 1);              // Verlassen des kritischen Bereich
 
           // PUT
         } else if (strncmp(buffer, stringPut, 3) == 0) {
+          semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
+          // sleep(5);
           put(buffer, KeyValue_Wrapper->counter);
           printf("Counter %i\n", KeyValue_Wrapper->counter );
           KeyValue_Wrapper->counter++;
+          semop(db, &leave, 1);                 // Verlassen des kritischen Bereich
 
           // DELETE
         } else if (strncmp(buffer, stringDel, 3) == 0) {
+          semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
           int delValue = delete(buffer, KeyValue_Wrapper->counter);
           KeyValue_Wrapper->counter--;
           if(delValue == 0){
@@ -126,6 +170,7 @@ int main() {
           } else {
             printf("Erfolgreich gelöscht!\n");
           }
+          semop(db, &leave, 1);                 // Verlassen des kritischen Bereich
 
           // quit
         } else if(strncmp(buffer, quit, 4) != 0) {
@@ -170,8 +215,6 @@ void put(char* buffer, int counter) {
   printf("PUT Funktion\n");
   int count = strtoken(buffer, " ", result, 3);
   for(int i = 0; i < KeyValue_Wrapper->counter; i++) {
-    printf("KeyValue: %s\n", KeyValue_Wrapper->keyValues[i].key);
-    printf("Result: %s\n", result[1]);
     if(strcmp(KeyValue_Wrapper->keyValues[i].key, result[1]) == 0) {
       strcpy(KeyValue_Wrapper->keyValues[i].value, result[2]);
       printf("Key gefunden und überschrieben %s\n", KeyValue_Wrapper->keyValues[i].value);

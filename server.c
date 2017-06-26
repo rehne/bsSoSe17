@@ -214,7 +214,7 @@ void put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion\n");
   int count = strtoken(buffer, " ", result, 3);
-  for(int i = 0; i < KeyValue_Wrapper->counter; i++) {
+  for(int i = 0; i <= KeyValue_Wrapper->counter; i++) {
     if(strcmp(KeyValue_Wrapper->keyValues[i].key, result[1]) == 0) {
       strcpy(KeyValue_Wrapper->keyValues[i].value, result[2]);
       printf("Key gefunden und überschrieben %s\n", KeyValue_Wrapper->keyValues[i].value);

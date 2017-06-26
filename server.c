@@ -156,7 +156,7 @@ int main() {
           semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
           // sleep(5);
           put(buffer, KeyValue_Wrapper->counter);
-          printf("Counter %i\n", KeyValue_Wrapper->counter );
+          printf("Counter %i\n\n", KeyValue_Wrapper->counter );
           KeyValue_Wrapper->counter++;
           semop(db, &leave, 1);                 // Verlassen des kritischen Bereich
 
@@ -192,7 +192,7 @@ int strtoken(char *str, char *separator, char **token, int size) {
   while(token[i++] && i < size) {
     token[i] = strtok(NULL, separator);
   }
-  return (i);
+  return i;
 }
 
 // GET Funktion
@@ -222,7 +222,8 @@ void put(char* buffer, int counter) {
       strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key, result[1]);
       printf("Key gespeichert: %s\n", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key);
       strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[2]);
-      printf("Value gespeichert: %s\n", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
+      printf("Value gespeichert: %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
+      break;
     }
   }
 }

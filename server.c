@@ -118,6 +118,20 @@ int main() {
         printf("Client %s ist verbunden ...\n", inet_ntoa(server.sin_addr));
       }
 
+      // Willkommensnachricht
+      write(new_sock, "************************************************\n", 49);
+      write(new_sock, "*                                              *\n", 49);
+      write(new_sock, "*    Welcome to this fresh Key-Value Server    *\n", 49);
+      write(new_sock, "*                                              *\n", 49);
+      write(new_sock, "************************************************\n", 49);
+      write(new_sock, "*                                              *\n", 49);
+      write(new_sock, "*   Folgende Funktionen stehen zur Verfügung   *\n", 50);
+      write(new_sock, "* PUT {key} {value} (Key-Value Wert speichern) *\n", 49);
+      write(new_sock, "* GET {key}         (Value eines Key abfragen) *\n", 49);
+      write(new_sock, "* DEL {key}         (Key-Value Wert löschen)   *\n", 50);
+      write(new_sock, "*                                              *\n", 49);
+      write(new_sock, "************************************************\n", 49);
+
       struct sembuf enter, leave;               // structs für den Semaphor
       enter.sem_num = leave.sem_num = 0;        // Semaphor 0 in der Gruppe
       enter.sem_flg = leave.sem_flg = SEM_UNDO;

@@ -119,18 +119,18 @@ int main() {
       }
 
       // Willkommensnachricht
-      write(new_sock, "************************************************\n", 49);
-      write(new_sock, "*                                              *\n", 49);
-      write(new_sock, "*    Welcome to this fresh Key-Value Server    *\n", 49);
-      write(new_sock, "*                                              *\n", 49);
-      write(new_sock, "************************************************\n", 49);
-      write(new_sock, "*                                              *\n", 49);
-      write(new_sock, "*   Folgende Funktionen stehen zur Verfügung   *\n", 50);
-      write(new_sock, "* PUT {key} {value} (Key-Value Wert speichern) *\n", 49);
-      write(new_sock, "* GET {key}         (Value eines Key abfragen) *\n", 49);
-      write(new_sock, "* DEL {key}         (Key-Value Wert löschen)   *\n", 50);
-      write(new_sock, "*                                              *\n", 49);
-      write(new_sock, "************************************************\n", 49);
+      write(new_sock, "***************************************************\n", 52);
+      write(new_sock, "*                                                 *\n", 52);
+      write(new_sock, "*    Welcome to this fresh Key-Value Server       *\n", 52);
+      write(new_sock, "*                                                 *\n", 52);
+      write(new_sock, "***************************************************\n", 52);
+      write(new_sock, "*                                                 *\n", 52);
+      write(new_sock, "*  Folgende Funktionen stehen zur Verfügung :     *\n", 53);
+      write(new_sock, "*  - PUT {key} {value} (Key-Value Wert speichern) *\n", 52);
+      write(new_sock, "*  - GET {key}         (Value eines Key abfragen) *\n", 52);
+      write(new_sock, "*  - DEL {key}         ( Key-Value Wert löschen ) *\n", 53);
+      write(new_sock, "*                                                 *\n", 52);
+      write(new_sock, "***************************************************\n", 52);
 
       struct sembuf enter, leave;               // structs für den Semaphor
       enter.sem_num = leave.sem_num = 0;        // Semaphor 0 in der Gruppe

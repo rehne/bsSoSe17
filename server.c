@@ -13,7 +13,7 @@
 #include <sys/sem.h>
 #include <sys/ipc.h>
 #include <sys/wait.h>
-#define BUF 1024
+#define BUF 128
 #define SEGSIZE sizeof(keyValues)
 
 int counter = 0;
@@ -49,12 +49,13 @@ int main() {
   char *stringDel = "DEL";
   char *message;
   char buffer[BUF];
+  char line[BUF];
 
   // Initialisieren vom struct sin mit geeigneten Werten
   int sin_len = sizeof(server);
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port = htons(4711); // 4711 ist die Portangabe
+  server.sin_port = htons(4711);      // 4711 ist die Portangabe
 
   // Socket erzeugen
   if((sock = socket(AF_INET, SOCK_STREAM, 0)) > 0) {
@@ -74,7 +75,7 @@ int main() {
   if (listen(sock, 5) < 0) {
     perror("Error on listen");
   } else {
-    printf("Server bereit\n");
+    printf("Server bereit.\n");
   }
 
   unsigned short marker[1]; // aus technischen Gründen
@@ -108,6 +109,28 @@ int main() {
   KeyValue_Wrapper = shmat(id, 0, 0);
   KeyValue_Wrapper->counter = 0;
   KeyValue_Wrapper->readcounter = 0;
+
+  // Werte aus der database.txt in struct Array laden
+  FILE *file = fopen("database.txt", "r");
+  if (file == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+  }
+  char **result = malloc(100);
+  int whilecounter = 0;
+  while(fgets(line, sizeof(line), file)) {
+    int count = strtoken(line, " ", result, 2);
+
+    printf("Key: %s\n", result[0]);
+    printf("Value: %s\n", result[1]);
+
+    KeyValue_Wrapper->counter = whilecounter;
+    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key, result[0]);
+    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[1]);
+
+    whilecounter++;
+  }
+  fclose(file);
 
   while(1) {
     new_sock = accept(sock, (struct sockaddr *) &server, &addrlen);
@@ -168,9 +191,20 @@ int main() {
           // PUT
         } else if (strncmp(buffer, stringPut, 3) == 0) {
           semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
-          // sleep(5);
+          // sleep(10);
           put(buffer, KeyValue_Wrapper->counter);
+          write(new_sock, "Key gespeichert: ", 18);
+          write(new_sock, KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key, sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key));
+          write(new_sock, "\n", 1);
           printf("Counter %i\n\n", KeyValue_Wrapper->counter );
+          file = fopen("database.txt", "a");       // 2. Parameter a = append
+          if (file == NULL) {
+            printf("Error opening file!\n");
+            exit(1);
+          }
+          fprintf(file, "%s %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,
+                              KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
+          fclose(file);
           KeyValue_Wrapper->counter++;
           semop(db, &leave, 1);                 // Verlassen des kritischen Bereich
 

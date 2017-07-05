@@ -1,5 +1,4 @@
 // Verbindung mit telnet 127.0.0.1 4711 herstellen
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -34,7 +33,7 @@ struct KeyValueWrapper_ *KeyValue_Wrapper;
 
 int strtoken(char *str, char *separator, char **token, int size);
 int get(char* buffer, int counter);
-void put(char* buffer, int counter);
+int put(char* buffer, int counter);
 int delete(char* buffer, int counter);
 void swap(int a, int b);
 
@@ -64,6 +63,9 @@ int main() {
     printf("Socket %i konnte nicht angelegt werden.\n", sock);
   }
 
+  int option = 1;
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *) &option, sizeof(int));
+
   // Socket binden
   if(bind(sock, (struct sockaddr *)& server, sizeof(server)) == 0) {
     printf("Socket %i wurde gebunden!\n", sock);
@@ -82,12 +84,12 @@ int main() {
 
   // Semaphore für den Zugriff auf readcounter
   int mutex = semget(IPC_PRIVATE, 1, IPC_CREAT|0777);
-  if(mutex == -1){
+  if(mutex == -1) {
     perror("Die Gruppe mutex konnte nicht angelegt werden!");
     exit(1);
   }
   int db = semget(IPC_PRIVATE, 1, IPC_CREAT|0777);
-  if(db == -1){
+  if(db == -1) {
     perror("Die Gruppe db konnte nicht angelegt werden!");
     exit(1);
   }
@@ -95,7 +97,7 @@ int main() {
   // Semaphoren auf 1 setzen
   marker[0] = 1;
   semctl(mutex, 1, SETALL, marker);
-  semctl(db, 1, SETALL, marker);
+  semctl(db,    1, SETALL, marker);
 
   // Shared Memory, neues Segment anlegen oder auf bestehendes Segment zurückgreifen
   int id = shmget(IPC_PRIVATE, sizeof(KeyValueWrapper), IPC_CREAT|0777);
@@ -117,18 +119,16 @@ int main() {
     exit(1);
   }
   char **result = malloc(100);
-  int whilecounter = 0;
   while(fgets(line, sizeof(line), file)) {
     int count = strtoken(line, " ", result, 2);
 
-    printf("Key: %s\n", result[0]);
-    printf("Value: %s\n", result[1]);
+    printf("Key: %s\n",   result[0]);
+    printf("Value: %s", result[1]);
+    printf("Counter: %d\n\n", KeyValue_Wrapper->counter);
 
-    KeyValue_Wrapper->counter = whilecounter;
-    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key, result[0]);
+    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,   result[0]);
     strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[1]);
-
-    whilecounter++;
+    KeyValue_Wrapper->counter++;
   }
   fclose(file);
 
@@ -141,7 +141,7 @@ int main() {
         printf("Client %s ist verbunden ...\n", inet_ntoa(server.sin_addr));
       }
 
-      // Willkommensnachricht
+      // Willkommensnachricht für den Client
       write(new_sock, "***************************************************\n", 52);
       write(new_sock, "*                                                 *\n", 52);
       write(new_sock, "*    Welcome to this fresh Key-Value Server       *\n", 52);
@@ -158,8 +158,8 @@ int main() {
       struct sembuf enter, leave;               // structs für den Semaphor
       enter.sem_num = leave.sem_num = 0;        // Semaphor 0 in der Gruppe
       enter.sem_flg = leave.sem_flg = SEM_UNDO;
-      enter.sem_op = -1;                        // blockieren, DOWN-Operation
-      leave.sem_op = 1;                         // freigeben, UP-Operation
+      enter.sem_op  = -1;                       // blockieren, DOWN-Operation
+      leave.sem_op  = 1;                        // freigeben, UP-Operation
 
       while(strncmp(buffer, quit, 4) != 0) {
         int size = read(new_sock, buffer, BUF-1);
@@ -171,19 +171,20 @@ int main() {
         if (strncmp(buffer, stringGet, 3) == 0) {
           semop(mutex, &enter, 1);              // Eintritt in kritischen Bereich
           KeyValue_Wrapper->readcounter += 1;
-          if(KeyValue_Wrapper->readcounter == 1){
+          if(KeyValue_Wrapper->readcounter == 1) {
             semop(db, &enter, 1);
           }
           semop(mutex, &leave, 1);
           int getValue = get(buffer, KeyValue_Wrapper->counter);
           if(getValue >= 0) {
-            write(new_sock, KeyValue_Wrapper->keyValues[getValue].value, sizeof(KeyValue_Wrapper->keyValues[getValue].value));
+            write(new_sock, KeyValue_Wrapper->keyValues[getValue].value,
+                     sizeof(KeyValue_Wrapper->keyValues[getValue].value));
           } else if(getValue == -1) {
             write(new_sock, "Fehler: Kein Value gefunden!\n", 29);
           }
           semop(mutex, &enter, 1);
           KeyValue_Wrapper->readcounter -= 1;
-          if(KeyValue_Wrapper->readcounter == 0){
+          if(KeyValue_Wrapper->readcounter == 0) {
             semop(db, &leave, 1);
           }
           semop(mutex, &leave, 1);              // Verlassen des kritischen Bereich
@@ -192,20 +193,29 @@ int main() {
         } else if (strncmp(buffer, stringPut, 3) == 0) {
           semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
           // sleep(10);
-          put(buffer, KeyValue_Wrapper->counter);
+          int putValue = put(buffer, KeyValue_Wrapper->counter);
           write(new_sock, "Key gespeichert: ", 18);
-          write(new_sock, KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key, sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key));
+          write(new_sock, KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,
+                   sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key));
           write(new_sock, "\n", 1);
-          printf("Counter %i\n\n", KeyValue_Wrapper->counter );
-          file = fopen("database.txt", "a");       // 2. Parameter a = append
-          if (file == NULL) {
+          printf("Counter %i\n\n", KeyValue_Wrapper->counter);
+          printf("putValue: %i\n", putValue);
+          if(putValue == 0){
+            write(new_sock, "Key wurde mit neuem Value überschrieben.\n", 42);
+          } else {
+            KeyValue_Wrapper->counter++;
+            write(new_sock, "Erfolgreich gespeichert.\n", 25);
+          }
+          file = fopen("database.txt", "w+");
+          if(file == NULL){
             printf("Error opening file!\n");
             exit(1);
           }
-          fprintf(file, "%s %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,
-                              KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
+          for (int i = 0; i < KeyValue_Wrapper->counter; i++) {
+            fprintf(file, "%s %s", KeyValue_Wrapper->keyValues[i].key,
+                                   KeyValue_Wrapper->keyValues[i].value);
+          }
           fclose(file);
-          KeyValue_Wrapper->counter++;
           semop(db, &leave, 1);                 // Verlassen des kritischen Bereich
 
           // DELETE
@@ -213,9 +223,19 @@ int main() {
           semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
           int delValue = delete(buffer, KeyValue_Wrapper->counter);
           KeyValue_Wrapper->counter--;
-          if(delValue == 0){
+          if(delValue == 0) {
             write(new_sock, "Value nicht gefunden!\n", 22);
           } else {
+            file = fopen("database.txt", "w+");
+            if(file == NULL){
+              printf("Error opening file!\n");
+              exit(1);
+            }
+            for (int i = 0; i < KeyValue_Wrapper->counter; i++) {
+              fprintf(file, "%s %s", KeyValue_Wrapper->keyValues[i].key,
+                                     KeyValue_Wrapper->keyValues[i].value);
+            }
+            fclose(file);
             printf("Erfolgreich gelöscht!\n");
           }
           semop(db, &leave, 1);                 // Verlassen des kritischen Bereich
@@ -258,39 +278,41 @@ int get(char* buffer, int counter) {
 }
 
 // PUT Funktion
-void put(char* buffer, int counter) {
+int put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion\n");
   int count = strtoken(buffer, " ", result, 3);
-  for(int i = 0; i <= KeyValue_Wrapper->counter; i++) {
-    if(strcmp(KeyValue_Wrapper->keyValues[i].key, result[1]) == 0) {
+  for(int i = 0; i < counter; i++)
+    if(strcmp(KeyValue_Wrapper->keyValues[i].key,  result[1]) == 0) {
       strcpy(KeyValue_Wrapper->keyValues[i].value, result[2]);
       printf("Key gefunden und überschrieben %s\n", KeyValue_Wrapper->keyValues[i].value);
-    } else {
-      strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key, result[1]);
-      printf("Key gespeichert: %s\n", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key);
-      strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[2]);
-      printf("Value gespeichert: %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
-      break;
+      return 0;
     }
-  }
+
+    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,   result[1]);
+    printf("Key gespeichert: %s\n", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key);
+    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[2]);
+    printf("Value gespeichert: %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
+    return 1;
 }
 
 // DELETE Funktion
 int delete(char* buffer, int counter) {
   int getValue = get(buffer, KeyValue_Wrapper->counter);
   printf("getValue: %i\n", getValue);
-  if(getValue >= 0){
+  if(getValue >= 0) {
     swap(getValue, KeyValue_Wrapper->counter);
-    memset(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].key, 0, sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].key));
-    memset(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].value, 0, sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].value));
+    memset(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].key,
+           0, sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].key));
+    memset(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].value,
+           0, sizeof(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter-1].value));
     return 1;
   }
   return 0;
 }
 
-void swap(int a, int b){
+void swap(int a, int b) {
   KeyValue temp = KeyValue_Wrapper->keyValues[a];
-  KeyValue_Wrapper->keyValues[a] = KeyValue_Wrapper->keyValues[b-1];
+  KeyValue_Wrapper->keyValues[a]   = KeyValue_Wrapper->keyValues[b-1];
   KeyValue_Wrapper->keyValues[b-1] = temp;
 }

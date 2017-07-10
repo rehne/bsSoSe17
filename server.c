@@ -50,8 +50,7 @@ int main() {
   char buffer[BUF];
   char line[BUF];
 
-  // Initialisieren vom struct sin mit geeigneten Werten
-  int sin_len = sizeof(server);
+  // Initialisieren vom struct server mit geeigneten Werten
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons(4711);      // 4711 ist die Portangabe
@@ -63,6 +62,7 @@ int main() {
     printf("Socket %i konnte nicht angelegt werden.\n", sock);
   }
 
+  // Socket nach beenden wieder freigeben
   int option = 1;
   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *) &option, sizeof(int));
 
@@ -89,7 +89,7 @@ int main() {
     exit(1);
   }
   int db = semget(IPC_PRIVATE, 1, IPC_CREAT|0777);
-  if(db == -1) {
+  if (db == -1) {
     perror("Die Gruppe db konnte nicht angelegt werden!");
     exit(1);
   }
@@ -282,18 +282,18 @@ int put(char* buffer, int counter) {
   char **result = malloc(100);
   printf("PUT Funktion\n");
   int count = strtoken(buffer, " ", result, 3);
-  for(int i = 0; i < counter; i++)
+  for(int i = 0; i < counter; i++) {
     if(strcmp(KeyValue_Wrapper->keyValues[i].key,  result[1]) == 0) {
       strcpy(KeyValue_Wrapper->keyValues[i].value, result[2]);
       printf("Key gefunden und überschrieben %s\n", KeyValue_Wrapper->keyValues[i].value);
       return 0;
     }
-
-    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,   result[1]);
-    printf("Key gespeichert: %s\n", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key);
-    strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[2]);
-    printf("Value gespeichert: %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
-    return 1;
+  }
+  strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key,   result[1]);
+  printf("Key gespeichert: %s\n", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].key);
+  strcpy(KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value, result[2]);
+  printf("Value gespeichert: %s", KeyValue_Wrapper->keyValues[KeyValue_Wrapper->counter].value);
+  return 1;
 }
 
 // DELETE Funktion

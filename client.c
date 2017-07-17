@@ -19,32 +19,23 @@ int main(int argc, char *argv[]) {
       return 1;
     }
 
+    // Socket anlegen
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+      printf("Socket konnte nicht angelegt werden.\n");
+    } else {
+      printf("Socket %i wurde angelegt\n", sock);
+    }
+
     server.sin_family = AF_INET;
-    server.sin_port = htons(4712);
+    server.sin_port = htons(4711);
     //server.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // Socket anlegen
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0) > 0)) {
-      printf("Socket %i wurde angelegt\n", sock);
-    } else {
-      printf("Socket konnte nicht angelegt werden.\n");
-    }
-
     // Socket nach beenden wieder freigeben
-    int option = 1;
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *) &option, sizeof(int));
-
-    // Socket binden
-    /*
-    if(bind(sock, (struct sockaddr *)& server, sizeof(server)) == 0) {
-      printf("Socket %i wurde gebunden!\n", sock);
-    } else {
-      printf("Der Port ist nicht frei - belegt!\n");
-    }
-    */
+    //int option = 1;
+    //setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const void *) &option, sizeof(int));
 
     // IP-Adresse in Binärform umwandeln
-    if(inet_pton(AF_INET, argv[1], &server.sin_addr.s_addr) <= 0) {
+    if(inet_pton(AF_INET, argv[1], &server.sin_addr) <= 0) {
       printf("Fehler beim konvertieren der IP-Adresse\n");
       return 1;
     }
@@ -57,16 +48,12 @@ int main(int argc, char *argv[]) {
             inet_ntoa(server.sin_addr));
     }
 
-    while(strcmp(buffer, "quit\n") != 0){
+    while(1){
       fgets(buffer, sizeof(buffer), stdin);
-      if(write(sock, buffer, strlen(buffer)) <= 0){
-        printf("Fehler beim Schreiben\n");
-        return 1;
-      } else if(read(sock, server_reply, sizeof(server_reply)) <= 0){
-        printf("Fehler beim Lesen\n");
-        return 1;
-      }
+      read(sock, server_reply, sizeof(server_reply));
+      write(sock, buffer, strlen(buffer));
       puts(server_reply);
     }
+    close(sock);
     return (EXIT_SUCCESS);
 }

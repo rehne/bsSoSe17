@@ -12,8 +12,7 @@
 #include <sys/sem.h>
 #include <sys/ipc.h>
 #include <sys/wait.h>
-#define BUF 128
-#define SEGSIZE sizeof(keyValues)
+#define BUF 1024
 
 int counter = 0;
 
@@ -122,7 +121,7 @@ int main() {
   while(fgets(line, sizeof(line), file)) {
     int count = strtoken(line, " ", result, 2);
 
-    printf("Key: %s\n",   result[0]);
+    printf("Key: %s\n", result[0]);
     printf("Value: %s", result[1]);
     printf("Counter: %d\n\n", KeyValue_Wrapper->counter);
 
@@ -222,10 +221,10 @@ int main() {
         } else if (strncmp(buffer, stringDel, 3) == 0) {
           semop(db, &enter, 1);                 // Eintritt in kritischen Bereich
           int delValue = delete(buffer, KeyValue_Wrapper->counter);
-          KeyValue_Wrapper->counter--;
           if(delValue == 0) {
             write(new_sock, "Value nicht gefunden!\n", 22);
           } else {
+            KeyValue_Wrapper->counter--;
             file = fopen("database.txt", "w+");
             if(file == NULL){
               printf("Error opening file!\n");
